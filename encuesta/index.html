@@ -847,7 +847,7 @@
     <div class="cta-section">
       <div class="cta-title">¿Lista para trabajar esto de raíz?</div>
       <div class="cta-sub">En Mentes Abundantes trabajamos exactamente esto — el merecimiento<br>que transforma cómo operas como emprendedora.</div>
-      <!-- ✏️ CAMBIA ESTA URL POR TU LINK REAL DE SYSTEME.IO -->
+      
       <a class="btn-cta" href="https://www.mentes-abundantes.com/encuestaia" target="_blank">Quiero unirme a Mentes Abundantes</a>
       <button class="btn-restart" onclick="restart()">Volver a empezar</button>
     </div>
@@ -858,12 +858,9 @@
 
 <script>
 // ════════════════════════════════════════════════
-// CONFIGURACIÓN SYSTEME.IO
+// CONFIGURACIÓN GOOGLE SHEETS
 // ════════════════════════════════════════════════
-const SYSTEME_API_KEY = "vy8dfl3ldycwk8733aip5rwpbfxt78d2zewte0899qfzeer1a6sw5lur0kd075bc";
-const SYSTEME_API_URL = "https://api.systeme.io/api/contacts";
-// Etiqueta que se asigna a cada lead de esta encuesta en Systeme.io:
-const LEAD_TAG = "encuesta-IA";
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzMQMn2XgRGu004Bo8cfb8udjdVt7nZq-AOAv50BzopWQdoIWl_4f_m5JkghYrYmS3v/exec";
 // ════════════════════════════════════════════════
 
 const Qs = [
@@ -1033,29 +1030,16 @@ async function submitLead(){
     fuente:   "Encuesta Mentes Abundantes"
   };
 
-  // Crear contacto via API oficial de Systeme.io
-  const payload = {
-    email:     leadData.email,
-    firstName: leadData.nombre,
-    lastName:  leadData.apellido,
-    fields: [
-      { slug: "phone_number", value: leadData.telefono }
-    ],
-    tags: [LEAD_TAG]
-  };
-
+  // Enviar a Google Sheets via Apps Script
   try{
-    const res = await fetch(SYSTEME_API_URL, {
+    await fetch(SHEETS_URL, {
       method:  "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key":    SYSTEME_API_KEY
-      },
-      body: JSON.stringify(payload)
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(leadData),
+      mode:    "no-cors"
     });
-    if(!res.ok){ const err=await res.text(); console.warn("Systeme.io error:", res.status, err); }
   } catch(e){
-    console.warn("Error de red al crear contacto:", e);
+    console.warn("Error enviando a Google Sheets:", e);
   }
 
   document.getElementById("lead-section").classList.add("hidden");
